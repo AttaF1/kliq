@@ -239,4 +239,4 @@ ARCHITECTURE.md    Deeper architecture
 tests/
 ```
 
-Read **[ARCHITECTURE.md](./ARCHITECTURE.md)**.* here
+Read **[ARCHITECTURE.md](./ARCHITECTURE.md)** here
