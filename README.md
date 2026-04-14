@@ -2,18 +2,17 @@
 
 ## In plain English
 
-Imagine you work for a brand and you have a **campaign brief** (who you want to reach, which apps, budget, etc.). This small web service reads a **pool of creators** from a file, **scores every creator** against your brief, and sends back the **best five** matches. Each match includes **sub-scores** (so you can see *why* someone ranked high) and a short **written explanation**.
+This small web service reads a **pool of creators** from a file, **scores every creator** against the brief request, and sends back the **best five** matches. Each match includes **sub-scores** (so user can see *why* someone ranked high) and a short **written explanation**.
 
-You do not need to be a developer to understand the ideas below. Technical commands are spelled out step by step.
 
 ---
 
-## Part 2 submission checklist (PDF)
+## Submission checklist
 
 | # | What the PDF asks for | Where to find it |
 |---|------------------------|------------------|
 | **1** | Short Markdown document: architecture, algorithm, key design decisions | **[ARCHITECTURE.md](./ARCHITECTURE.md)** |
-| **2** | Link to a **public GitHub** repo with the full source code | *Add your repository URL here when you publish.* |
+| **2** | Link to a **public GitHub** repo with the full source code | *https://github.com/AttaF1/kliq* |
 | **3** | **README** instructions to build and run locally with **Docker** and **Docker Compose** | **→ [Run with Docker (step by step)](#run-with-docker-and-docker-compose-step-by-step)** |
 | **4** | How **matching** works, how dimensions are **weighted**, how **missing data** is handled | **→ [How matching works](#how-matching-works-plain-english)** |
 | **5** | What you would improve to scale to **100k+ creators** and **sub-second** responses | **→ [Future improvements at scale](#future-improvements-at-scale)** |
