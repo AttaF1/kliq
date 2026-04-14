@@ -1,4 +1,4 @@
-# Kliq — Creator Matching Engine
+# Kliq's creator Matching Engine
 
 ## In plain English
 
