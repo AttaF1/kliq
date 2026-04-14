@@ -1,6 +1,6 @@
 # Kliq's creator Matching Engine
 
-## In plain English
+## Introduction
 
 This small web service reads a **pool of creators** from a file, **scores every creator** against the brief request, and sends back the **best five** matches. Each match includes **sub-scores** (so user can see *why* someone ranked high) and a short **written explanation**.
 
