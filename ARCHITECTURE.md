@@ -1,12 +1,10 @@
-# Architecture — Matching Microservice (Kliq Part 2)
-
-Aligned with the **Engineering Manager Candidate Case Study — Part 2**.
+# Architecture
 
 ## Why this architecture
 
-We chose a **small, boring, and explicit** shape on purpose:
+I chose a **small, boring, and explicit** shape on purpose:
 
-1. **FastAPI + Pydantic (`main.py`, `models.py`)** — The PDF defines a JSON contract; Pydantic validates requests and responses automatically and generates OpenAPI at `/docs`. That keeps the HTTP layer thin and errors visible early.
+1. **FastAPI + Pydantic (`main.py`, `models.py`)**,  The requirements in the PDF defines a JSON contract, Pydantic validates requests and responses automatically and generates OpenAPI at `/docs`. That keeps the HTTP layer thin and errors visible early.
 
 2. **Pure rule engine (`scoring.py`)** — All matching math lives in **one module** with **no I/O and no logging**. That separation means: (a) the same functions are easy to unit test, (b) behavior is deterministic and auditable for stakeholders, and (c) `main.py` only handles transport, file load, sorting, and operational logs. For a case-study pool (~1k creators), a transparent **weighted rule-based** scorer is appropriate; it matches the brief’s explainability requirement without needing training data or a model-serving stack.
 
