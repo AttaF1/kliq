@@ -1,0 +1,23 @@
+# =============================================================================
+# Kliq matching service — direct Python dependencies
+# =============================================================================
+#
+# Runtime (HTTP API + validation):
+#   fastapi     → app/main.py, app/auth.py (routes, API key security, validation hooks)
+#   uvicorn     → ASGI server (Docker CMD and local dev)
+#   pydantic    → app/models.py (request/response JSON shapes)
+#
+# Starlette is installed automatically as a dependency of FastAPI (ASGI stack).
+#
+# Standard library only (no extra packages):
+#   app/scoring.py, app/json_sanitize.py, app/middleware.py
+#
+# Development / tests:
+#   pytest, httpx → tests/ (httpx is used by FastAPI TestClient)
+# =============================================================================
+
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+pydantic==2.10.6
+pytest==8.3.4
+httpx==0.28.1

@@ -1,0 +1,13 @@
+services:
+  matching-api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      LOG_LEVEL: INFO
+      CREATORS_DB_PATH: /app/data/creators_database.json
+      # Uncomment to require a key on POST /match (comma-separated for rotation):
+      # KLIQ_API_KEYS: "1273861278y2ugh,uygjhsefdgg867234"
+    # Optional: mount a different JSON without rebuilding
+    # volumes:
+    #   - ./data/creators_database.json:/app/data/creators_database.json:ro
