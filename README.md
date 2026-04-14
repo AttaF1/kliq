@@ -1,4 +1,4 @@
-# Kliq's creator Matching Engine
+# Kliq's Creator Matching Engine
 
 ## Introduction
 
@@ -15,11 +15,10 @@ This small web service reads a **pool of creators** from a file, **scores every 
 | **2** | Link to a **public GitHub** repo with the full source code | *https://github.com/AttaF1/kliq* |
 | **3** | **README** instructions to build and run locally with **Docker** and **Docker Compose** | **→ [Run with Docker (step by step)](#run-with-docker-and-docker-compose-step-by-step)** |
 | **4** | How **matching** works, how dimensions are **weighted**, how **missing data** is handled | **→ [How matching works](#how-matching-works-plain-english)** |
-| **5** | What you would improve to scale to **100k+ creators** and **sub-second** responses | **→ [Future improvements at scale](#future-improvements-at-scale)** |
+| **5** | What I would improve to scale to **100k+ creators** and **sub-second** responses | **→ [Future improvements at scale](#future-improvements-at-scale)** |
 
 ---
 
-## What you need installed
 
 **To use Docker (recommended for the case study):**
 
@@ -32,21 +31,21 @@ This small web service reads a **pool of creators** from a file, **scores every 
 
 ---
 
-## Run with Docker and Docker Compose (step by step)
+## Run with Docker and Docker Compose
 
 Follow these steps **in order** from a terminal.
 
-### Step 1 — Open the project folder
+### Step 1: Open the project folder
 
 Go to the folder that contains this README, `Dockerfile`, and `docker-compose.yml`:
 
 ```bash
-cd /path/to/kliq-matching-service
+cd /path/to/kliq
 ```
 
 *(Replace `/path/to/` with the real path on your computer.)*
 
-### Step 2 — Build the image and start the container
+### Step 2: Build the image and start the container
 
 This downloads the base Python image (first time only), installs dependencies, copies the app, and starts the server on port **8000**:
 
@@ -57,7 +56,7 @@ docker compose up --build
 - The first run can take a few minutes.
 - Leave this terminal **open**. You should eventually see logs from **Uvicorn** showing the server is listening.
 
-### Step 3 — Check that the service is alive
+### Step 3: Check that the service is alive
 
 Open a **second** terminal (keep the first one running) and run:
 
@@ -73,9 +72,9 @@ With `jq`:
 curl -s http://localhost:8000/health | jq
 ```
 
-### Step 4 — Try a match (sample campaign)
+### Step 4: Try a match (sample campaign)
 
-This sends a sample brief and prints the top five creators:
+This sends a sample brief request and prints the top five creators:
 
 ```bash
 curl -s -X POST http://localhost:8000/match \
@@ -99,11 +98,11 @@ curl -s -X POST http://localhost:8000/match \
   }' | jq
 ```
 
-If you turned on API keys (see [Environment variables](#environment-variables)), add a header, for example:
+I have added an optional feature to secure the API, to turn on API keys (see [Environment variables](#environment-variables)), add a header, for example:
 
-`-H "X-API-Key: your-secret-key"`
+`-H "X-API-Key: secret-key"`
 
-### Step 5 — Explore the interactive API page (optional)
+### Step 5: Explore the interactive API page (optional)
 
 In your browser open:
 
@@ -140,11 +139,11 @@ docker compose down
 | `LOG_LEVEL` | `INFO` (normal) or `DEBUG` (very detailed logs per creator). |
 | `KLIQ_API_KEYS` | Optional. If you set one or more comma-separated keys, **`POST /match`** requires `X-API-Key` or `Authorization: Bearer`. **`GET /health`** stays open for health checks. |
 
-In **Docker Compose**, you can uncomment and set `KLIQ_API_KEYS` in `docker-compose.yml`. For a different dataset file without rebuilding, uncomment the `volumes:` example in that file to mount your own JSON.
+In **Docker Compose**, you can uncomment and set `KLIQ_API_KEYS` in `docker-compose.yml`.
 
 ---
 
-## Run on your machine without Docker
+## Run on a Computer without Docker
 
 1. `cd` into this project folder.  
 2. Create a virtual environment: `python3 -m venv .venv`  
@@ -153,19 +152,15 @@ In **Docker Compose**, you can uncomment and set `KLIQ_API_KEYS` in `docker-comp
 5. Start the server: `uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`  
 6. Open `http://localhost:8000/health` and `http://localhost:8000/docs` as above.
 
-The sample data file is already at `data/creators_database.json`.
-
 ---
 
-## How matching works (plain English)
+## How matching works
 
-### The big picture
-
-For **each** creator in the pool, the engine computes **five numbers** (each capped). Those numbers are added into a **total score out of 100**. Everyone is sorted by that total; the API returns the **top five**.
+For **each** creator in the pool, the engine computes **five numbers** (each capped). Those numbers are added into a **total score out of 100**. Everyone is sorted by that total, the API returns the **top five**.
 
 ### How the five dimensions are weighted (caps)
 
-The case study treats some goals as more important than others. Each dimension has a **maximum** number of points; together they add up to **100**.
+The case study treats some goals as more important than others. Each dimension has a **maximum** number of points, together they add up to **100**.
 
 | Dimension | Max points | What it measures (simply) |
 |-----------|------------|---------------------------|
@@ -175,32 +170,32 @@ The case study treats some goals as more important than others. Each dimension h
 | **Engagement** | **20** | Are their engagement rates at least near what you asked for? |
 | **Budget** | **10** | Is their typical campaign cost in the ballpark of your min–max budget? |
 
-So **audience** can move the needle the most; **budget** is still considered but capped lower.
+So **audience** can move the needle the most, **budget** is still considered but capped lower.
 
-### Rules in a bit more detail (still non-technical)
+### Rules in a bit more detail
 
 - **Niche:** Same or synonym industries (e.g. beauty vs skincare) score highest; partial word overlap can give partial credit.  
-- **Audience:** Combines age band overlap, gender mix vs your target, and whether your cities show up in their audience locations—**weighted by followers** on the platforms you requested.  
+- **Audience:** Combines age band overlap, gender mix vs your target, and whether your cities show up in their audience locations, **weighted by followers** on the platforms you requested.  
 - **Platforms:** Missing a required platform hurts that part of the score.  
-- **Engagement:** Compared per required platform to your **minimum**; doing better than the minimum can help.  
+- **Engagement:** Compared per required platform to your **minimum**, doing better than the minimum can help.  
 - **Budget:** Smooth scoring inside your range; drifting far outside reduces the budget slice.
 
-The response also includes a **`match_reason`** string built from the same five slices so a human can skim *why* someone ranked well or poorly.
+The response also includes a **`match_reason`** string built from the same five slices so a user can see why a creator ranked well or poorly.
 
 ### Missing or incomplete creator data
 
-Real data is messy. The service tries **not** to crash and **not** to punish creators unfairly when something is blank:
+Real data is messy. I made sure that service tries **not** to crash and **not** to punish creators unfairly when something is blank.
 
-- If **audience demographics** are missing on a platform, the engine fills **neutral defaults** (e.g. mid-range age/gender, empty cities) so the math still runs. If we only have “proxy” platforms (not the ones you required), the **audience score is capped** so inflated scores do not sneak in.  
-- If a **required platform** is missing entirely, that platform contributes **zero** to platform and engagement parts—so the total score reflects the gap.  
+- If **audience demographics** are missing on a platform, the engine fills **neutral defaults** (e.g. mid-range age/gender, empty cities) so the math still runs 
+- If a **required platform** is missing entirely, that platform contributes **zero** to platform and engagement parts, so the total score reflects the gap.  
 - If **cost** is missing or invalid, budget scoring falls back to a **conservative** partial score instead of breaking the request.
 
 ---
 
-## Logging (for operators)
+## Logging
 
 - **INFO:** One summary line per match request (campaign id, how many creators scored, top score).  
-- **DEBUG:** Optional per-creator detail; set `LOG_LEVEL=DEBUG`.  
+- **DEBUG:** Optional per creator detail, set `LOG_LEVEL=DEBUG`.  
 - Core rules live in **`app/scoring.py`** without logging so automated **tests** stay simple.
 
 ---
@@ -240,19 +235,8 @@ data/
   creators_database.json
 Dockerfile
 docker-compose.yml
-ARCHITECTURE.md    Deeper architecture + PDF mapping
+ARCHITECTURE.md    Deeper architecture
 tests/
 ```
 
----
-
-## Part 1 (strategy / slides)
-
-Outside this folder (same repo/workspace):
-
-- `../KLIQ_PART1_ENGINEERING_MANAGER.md`  
-- `../KLIQ_PART1_SLIDE_DECK_OUTLINE.md`
-
----
-
-*Built for the **Kliq Engineering Manager** case study (Part 2). For design trade-offs and module-level detail, read **[ARCHITECTURE.md](./ARCHITECTURE.md)**.*
+Read **[ARCHITECTURE.md](./ARCHITECTURE.md)**.* here
